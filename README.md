@@ -1,13 +1,13 @@
-# ElastiDart
-[![Build Status](https://travis-ci.org/Pajn/ElastiDart.svg?branch=master)](https://travis-ci.org/Pajn/ElastiDart)
-[![Coverage Status](https://coveralls.io/repos/Pajn/ElastiDart/badge.svg)](https://coveralls.io/r/Pajn/ElastiDart)
+# ElasticDart
+[![Build Status](https://travis-ci.org/Pajn/ElasticDart.svg?branch=master)](https://travis-ci.org/Pajn/ElasticDart)
+[![Coverage Status](https://coveralls.io/repos/Pajn/ElasticDart/badge.svg)](https://coveralls.io/r/Pajn/ElasticDart)
 
 An ElasticSearch connector for Dart.
 
 ## Usage
 A simple usage example:
 ```dart
-import 'package:elasti_dart/elasti_dart.dart';
+import 'package:elastic_dart/elastic_dart.dart';
 
 main() async {
 }
@@ -16,4 +16,4 @@ main() async {
 ## Features and bugs
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: https://github.com/Pajn/ElastiDart/issues
+[tracker]: https://github.com/Pajn/ElasticDart/issues

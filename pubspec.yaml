@@ -1,4 +1,4 @@
-name: elasti_dart
+name: elastic_dart
 version: 0.0.1
 description: An ElasticSearch connector for Dart
 dependencies:

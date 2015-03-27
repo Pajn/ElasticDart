@@ -1,13 +1,11 @@
 language: dart
 
-services:
-  - elasticsearch
-
 dart:
   - dev
   - stable
 
-script: ./tool/travis.sh
-
 before_install:
- - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-1.5.0.deb && sudo service elasticsearch start
+  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-1.5.0.deb && sudo service elasticsearch start
+  - sleep 3
+
+script: ./tool/travis.sh

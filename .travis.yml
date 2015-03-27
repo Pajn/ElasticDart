@@ -4,4 +4,7 @@ dart:
   - dev
   - stable
 
+services:
+  - elasticsearch
+
 script: ./tool/travis.sh

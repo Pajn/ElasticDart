@@ -1,6 +1,9 @@
 name: elastic_dart
 version: 0.0.1
 description: An ElasticSearch connector for Dart
+authors:
+- Jesper Håkansson <jesper@jesperh.se>
+- Rasmus Eneman <rasmus@eneman.eu>
 dependencies:
   http: any
 dev_dependencies:

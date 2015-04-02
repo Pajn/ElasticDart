@@ -1,4 +1,4 @@
-library elasti_dart;
+library elastic_dart;
 
 import 'dart:convert';
 import 'dart:async';

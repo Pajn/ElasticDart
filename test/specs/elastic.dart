@@ -22,7 +22,7 @@ main() {
         }
       };
 
-      var result = await es.search(query);
+      var result = await es.search(query: query);
       expect(result['_shards']).toBeNotNull();
 
       // We have two movies with the same name
@@ -50,6 +50,19 @@ main() {
       expect(result['hits']['hits'][4]['_source']['name']).toEqual('Annabelle');
     });
 
+    it('should be able to search on a specific index with a query', () async {
+      var query = {
+        "query": {
+          "match": {"name": "Annabelle"}
+        }
+      };
+      var result = await es.search(index: firstIndex, query: query);
+
+      expect(result['hits']['hits'][0]['_index']).toContain(firstIndex);
+      expect(result['hits']['hits'][0]['_source']['name']).toEqual('Annabelle');
+    });
+
+
     it('should be able to bulk', () async {
       var result = await es.bulk([
         {"index": {"_index": secondIndex, "_type": "movies", "_id": "2"} },
@@ -59,17 +72,58 @@ main() {
       expect(result.keys).toContain('items');
     });
 
-    it('should be able to search on a specific index with a query', () async {
-      var query = {
-        "query": {
-          "match": {"name": "Annabelle"}
-        }
-      };
-      var index = es.getIndex(firstIndex);
-      var result = await index.search(query);
+    it('should be able to create a new index', () async {
+      var result = await es.createIndex('testindex');
+      expect(result).toEqual({'acknowledged': true});
+    });
 
-      expect(result['hits']['hits'][0]['_index']).toContain(firstIndex);
-      expect(result['hits']['hits'][0]['_source']['name']).toEqual('Annabelle');
+    it('should be able to delete a index', () async {
+      var result = await es.deleteIndex('testindex');
+      expect(result).toEqual({'acknowledged': true});
+    });
+
+    it('should be able to put mapping', () async {
+      await es.createIndex('test-index');
+      var result = await es.putMapping(
+          {"test-type": {"properties": {"name": {"type": "string", "store": "yes"}}}},
+          index: 'test-index', type: 'test-type'
+      );
+      expect(result).toEqual({'acknowledged': true});
+      await es.deleteIndex('test-index');
+    });
+
+    it('should be able to get mapping on an index with a type', () async {
+      await es.createIndex('test-index');
+      await es.putMapping(
+          {"test-type": {"properties": {"message": {"type": "string", "store": "yes"}}}},
+          index: 'test-index', type: 'test-type'
+      );
+
+      await es.putMapping(
+          {"test-type2": {"properties": {"message": {"type": "string", "store": "yes"}}}},
+          index: 'test-index', type: 'test-type2'
+      );
+
+      var result = await es.getMapping(index: 'test-index', type: 'test-type2');
+      expect(result).toEqual({"test-index": {"mappings": {"test-type2": {"properties": {"message": {"type": "string", "store": true}}}}}});
+
+      result = await es.getMapping(index: 'test-index', type: 'test-type');
+      expect(result).toEqual({"test-index": {"mappings": {"test-type": {"properties": {"message": {"type": "string", "store": true}}}}}});
+
+      await es.deleteIndex('test-index');
+    });
+
+    it('should be able to get mapping on an index', () async {
+      await es.createIndex('test-index');
+      await es.putMapping(
+          {"test-type": {"properties": {"message": {"type": "string", "store": "true"}}}},
+          index: 'test-index', type: 'test-type'
+      );
+
+      var result = await es.getMapping(index: 'test-index');
+      expect(result).toEqual({"test-index": {"mappings": {"test-type": {"properties": {"message": {"type": "string", "store": true}}}}}});
+
+      await es.deleteIndex('test-index');
     });
   });
 }

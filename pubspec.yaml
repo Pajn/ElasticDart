@@ -1,11 +1,11 @@
 name: elastic_dart
-version: 0.0.1
+version: 0.1.0
 description: An ElasticSearch connector for Dart
 authors:
 - Jesper Håkansson <jesper@jesperh.se>
 - Rasmus Eneman <rasmus@eneman.eu>
 dependencies:
-  http: any
+  http: '>=0.11.1+3 <0.12.0'
 dev_dependencies:
-  guinness: any
-  unittest: any
+  guinness: '>=0.1.17 <0.2.0'
+  unittest: '>=0.11.0 <0.12.0'

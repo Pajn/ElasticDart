@@ -1,5 +1,7 @@
 part of elastic_dart;
 
+final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
+
 class ElasticSearch {
   /// The address of the ElasticSearch REST API.
   final String host;
@@ -22,8 +24,16 @@ class ElasticSearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
-  Future createIndex(String name, {Map settings: const {}}) {
-    return this._put(name, settings);
+  Future createIndex(String name, {Map settings: const {}, bool throwIfExists: true}) async {
+    try {
+      return await _put(name, settings);
+    } on ElasticSearchException catch(e) {
+      if (e.message.startsWith('IndexAlreadyExistsException')) {
+        if (throwIfExists) throw new IndexAlreadyExistsException(name, e.response);
+        return e.response;
+      }
+      rethrow;
+    }
   }
 
   /// Deletes an index by [name] or all indices if _all is passed.
@@ -38,7 +48,7 @@ class ElasticSearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-delete-index.html)
   Future deleteIndex(String name) {
-    return this._delete(name);
+    return _delete(name);
   }
 
   /// Searches the given [index] or all indices if _all is passed.
@@ -60,8 +70,7 @@ class ElasticSearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
   Future<Map<String, dynamic>> search({String index: '_all', Map<String, dynamic> query: const {}}) {
-    var body = JSON.encode(query);
-    return this._post('$index/_search', body);
+    return _post('$index/_search', query);
   }
 
   /// Register specific [mapping] definition for a specific [type].
@@ -75,8 +84,7 @@ class ElasticSearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-put-mapping.html)
   Future putMapping(Map<String, dynamic> mapping, {String index: '_all', String type: ''}) {
-    var body = JSON.encode(mapping);
-    return this._put('$index/_mapping/$type', body);
+    return _put('$index/_mapping/$type', mapping);
   }
 
   /// Retrieve mapping definitions for an [index] or index/type.
@@ -92,7 +100,7 @@ class ElasticSearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-mapping.html)
   Future getMapping({String index: '_all', String type: ''}) {
-    return this._get('$index/_mapping/$type');
+    return _get('$index/_mapping/$type');
   }
 
   /// Perform many index, delete, create, or update operations in a single call.
@@ -128,54 +136,33 @@ class ElasticSearch {
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';
 
-    return this._post('$index/$type/_bulk', body);
+    return _post('$index/$type/_bulk', body);
   }
 
-  Future _post(String path, body) async {
-    var response = await http.post('$host/$path', body: body);
+  Future _get(String path) => _request('GET', path);
+  Future _post(String path, body) => _request('POST', path, body);
+  Future _put(String path, body) => _request('PUT', path, body);
+  Future _delete(String path) => _request('DELETE', path);
 
-    body = UTF8.decode(response.bodyBytes);
-    response = JSON.decode(body);
-
-    if (response.containsKey('error')) {
-      throw response;
+  Future _request(String method, String path, [body]) async {
+    var request = new http.Request(method, Uri.parse('$host/$path'));
+    if (body != null) {
+      if (body is! String) {
+        body = JSON.encode(body);
+      }
+      request.body = body;
     }
 
-    return response;
-  }
+    var response = await request.send();
+    var responseBody = _responseDecoder.convert(await response.stream.toBytes());
 
-  Future _put(String path, body) async {
-    var response = await http.put('$host/$path', body: body);
-
-    body = UTF8.decode(response.bodyBytes);
-    response = JSON.decode(body);
-
-    if (response.containsKey('error')) {
-      throw response;
+    if (response.statusCode >= 400) {
+      if (responseBody['error'].startsWith('IndexMissingException')) {
+        throw new IndexMissingException(responseBody);
+      }
+      throw new ElasticSearchException(responseBody);
     }
 
-    return response;
-  }
-
-  Future _get(String path) async {
-    var response = await http.get('$host/$path');
-
-    response = JSON.decode(response.body);
-
-    if (response.containsKey('error')) {
-      throw response;
-    }
-    return response;
-  }
-
-  Future _delete(String path) async {
-    var response = await http.delete('$host/$path');
-
-    response = JSON.decode(response.body);
-
-    if (response.containsKey('error')) {
-      throw response;
-    }
-    return response;
+    return responseBody;
   }
 }

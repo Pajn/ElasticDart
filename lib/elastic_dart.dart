@@ -4,4 +4,5 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-part 'src/elastic.dart';
+part 'src/elastic_search.dart';
+part 'src/exceptions.dart';

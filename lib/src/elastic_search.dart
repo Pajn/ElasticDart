@@ -11,6 +11,7 @@ class ElasticSearch {
   /// Creates an index with the given [name] with optional [settings].
   ///
   /// Examples:
+  /// ```dart
   ///   // Creates an index called "movie-index" without any settings.
   ///   await elasticsearch.createIndex('movie-index');
   ///
@@ -21,6 +22,7 @@ class ElasticSearch {
   ///       "number_of_replicas" : 2
   ///       }
   ///    });
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
@@ -39,11 +41,13 @@ class ElasticSearch {
   /// Deletes an index by [name] or all indices if _all is passed.
   ///
   /// Examples:
+  /// ```dart
   ///   // Deletes the movie index.
   ///   await elasticsearch.deleteIndex('movie-index');
   ///
   ///   // Deletes all the indexes. Be careful with this!
   ///   await elasticsearch.deleteIndex('_all');
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-delete-index.html)
@@ -54,6 +58,7 @@ class ElasticSearch {
   /// Searches the given [index] or all indices if _all is passed.
   ///
   /// Examples:
+  /// ```dart
   ///   // Will search all indices and matches everything.
   ///   await elasticsearch.search();
   ///
@@ -66,6 +71,7 @@ class ElasticSearch {
   ///       "match": {"name": "Fury"}
   ///     }
   ///   });
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
@@ -76,10 +82,12 @@ class ElasticSearch {
   /// Register specific [mapping] definition for a specific [type].
   ///
   /// Examples:
+  /// ```dart
   ///   await es.putMapping(
   ///     {"test-type": {"properties": {"message": {"type": "string", "store": "yes"}}}},
   ///     index: 'movie-index', type: 'movie-type'
   ///   );
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-put-mapping.html)
@@ -91,11 +99,13 @@ class ElasticSearch {
   /// Gets all the mappings if _all is passed.
   ///
   /// Examples:
+  /// ```dart
   ///   // Get all the mappings on the specific index.
   ///   await es.getMapping(index: 'movie-index');
   ///
   ///   // Get mapping on the index and the specific type.
   ///   await es.getMapping(index: 'movie-index', type: 'movie-type');
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-mapping.html)
@@ -106,6 +116,7 @@ class ElasticSearch {
   /// Perform many index, delete, create, or update operations in a single call.
   ///
   /// Examples:
+  /// ```dart
   ///   await es.bulk([
   ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "1"} },
   ///     {"name": "Fury", "year": "2014" }
@@ -128,6 +139,7 @@ class ElasticSearch {
   ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "3"} },
   ///     {"name": "Annabelle", "year": "2014" }
   ///   ]);
+  /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/docs-bulk.html)

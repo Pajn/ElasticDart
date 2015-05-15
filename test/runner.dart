@@ -9,7 +9,7 @@ main() async {
   // Wait for elastic to index the new documents
   await new Future.delayed(new Duration(seconds: 2));
 
-  unittestConfiguration.timeout = const Duration(seconds: 3);
+  unittestConfiguration.timeout = const Duration(seconds: 5);
 
   elastic_search.main();
 }

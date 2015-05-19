@@ -1,6 +1,6 @@
 part of elastic_dart;
 
-final _indexMissing = new RegExp(r'IndexMissingException\[\[(\w+)\] missing\]');
+final _indexMissing = new RegExp(r'IndexMissingException\[\[([^\]]+)\] missing\]');
 String _missingIndex(String error) => _indexMissing.firstMatch(error).group(1);
 
 class ElasticsearchException implements Exception {

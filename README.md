@@ -3,7 +3,8 @@
 [![Coverage Status](https://coveralls.io/repos/Pajn/ElasticDart/badge.svg)](https://coveralls.io/r/Pajn/ElasticDart)
 
 An Elasticsearch connector for Dart. 
-Currently it features a thin wrapper around the REST API for indexing and querying.
+Includes both a thin wrapper around the REST API for indexing and querying and
+a [Warehouse][] companion adapter for easily adding search and ranking to repositories.
 
 ## Usage
 A simple usage example:
@@ -40,7 +41,11 @@ main() async {
 }
 ```
 
+For usage on the Warehouse adapter see the [example folder][].
+
 ## Features and bugs
 Please file feature requests and bugs at the [issue tracker][tracker].
 
+[Warehouse]: https://pub.dartlang.org/packages/warehouse
+[example folder]: 
 [tracker]: https://github.com/Pajn/ElasticDart/issues

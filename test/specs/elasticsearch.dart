@@ -4,7 +4,7 @@ import 'package:unittest/unittest.dart' show expectAsync;
 import 'package:elastic_dart/elastic_dart.dart';
 
 main() {
-  var es = new ElasticSearch();
+  var es = new Elasticsearch();
   var firstIndex = 'my_movies';
   var secondIndex = 'my_other_movies';
 
@@ -14,7 +14,7 @@ main() {
     ]);
   });
 
-  describe('ElasticSearch', () {
+  describe('Elasticsearch', () {
 
     describe('search', () {
       it('should be able to search the whole database with a query', () async {

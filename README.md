@@ -2,7 +2,8 @@
 [![Build Status](https://travis-ci.org/Pajn/ElasticDart.svg?branch=master)](https://travis-ci.org/Pajn/ElasticDart)
 [![Coverage Status](https://coveralls.io/repos/Pajn/ElasticDart/badge.svg)](https://coveralls.io/r/Pajn/ElasticDart)
 
-An ElasticSearch connector for Dart. Currently it features a thin wrapper around the REST api.
+An Elasticsearch connector for Dart. 
+Currently it features a thin wrapper around the REST API for indexing and querying.
 
 ## Usage
 A simple usage example:
@@ -11,7 +12,7 @@ import 'dart:async';
 import 'package:elastic_dart/elastic_dart.dart';
 
 main() async {
-  var es = new ElasticSearch();
+  var es = new Elasticsearch();
 
   await es.createIndex('my_movies', throwIfExists: false);
 

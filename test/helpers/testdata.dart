@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 setUpTestData() async {
+  await http.delete('http://127.0.0.1:9200/_all/');
   var body = [
     {"index": {"_index": "my_movies", "_type": "movies", "_id": "1"} },
     {"name": "The hunger games", "year": "2012" },

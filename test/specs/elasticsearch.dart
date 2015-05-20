@@ -1,3 +1,5 @@
+library elastic_dart.test.elasticsearch;
+
 import 'package:guinness/guinness.dart';
 import 'package:unittest/unittest.dart' show expectAsync;
 

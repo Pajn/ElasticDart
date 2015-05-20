@@ -3,6 +3,7 @@ import 'package:unittest/unittest.dart' show unittestConfiguration;
 
 import 'helpers/testdata.dart';
 import 'specs/elasticsearch.dart' as elasticsearch;
+import 'specs/warehouse/warehouse.dart' as warehouse;
 
 main() async {
   await setUpTestData();
@@ -12,4 +13,5 @@ main() async {
   unittestConfiguration.timeout = const Duration(seconds: 5);
 
   elasticsearch.main();
+  warehouse.main();
 }

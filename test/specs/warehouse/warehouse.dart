@@ -1,3 +1,5 @@
+library elastic_dart.test.warehouse;
+
 import 'dart:async';
 import 'package:guinness/guinness.dart';
 import 'package:warehouse/mocks.dart';

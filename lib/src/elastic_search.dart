@@ -4,9 +4,10 @@ final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
 
 class ElasticSearch {
   /// The address of the ElasticSearch REST API.
-  final String host;
+  final elasticRequest;
 
-  ElasticSearch([this.host = 'http://127.0.0.1:9200']);
+  ElasticSearch([String host = 'http://127.0.0.1:9200']):
+                elasticRequest = new ElasticRequest(host);
 
   /// Creates an index with the given [name] with optional [settings].
   ///
@@ -28,7 +29,7 @@ class ElasticSearch {
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
   Future createIndex(String name, {Map settings: const {}, bool throwIfExists: true}) async {
     try {
-      return await _put(name, settings);
+      return await elasticRequest.put(name, settings);
     } on ElasticSearchException catch(e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
         if (throwIfExists) throw new IndexAlreadyExistsException(name, e.response);
@@ -51,9 +52,7 @@ class ElasticSearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-delete-index.html)
-  Future deleteIndex(String name) {
-    return _delete(name);
-  }
+  Future deleteIndex(String name) => elasticRequest.delete(name);
 
   /// Searches the given [index] or all indices if _all is passed.
   ///
@@ -75,9 +74,9 @@ class ElasticSearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
-  Future<Map<String, dynamic>> search({String index: '_all', Map<String, dynamic> query: const {}}) {
-    return _post('$index/_search', query);
-  }
+  Future<Map<String, dynamic>> search({String index: '_all', Map<String, dynamic> query: const {}}) =>
+    elasticRequest.post('$index/_search', query);
+
 
   /// Register specific [mapping] definition for a specific [type].
   ///
@@ -91,9 +90,8 @@ class ElasticSearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-put-mapping.html)
-  Future putMapping(Map<String, dynamic> mapping, {String index: '_all', String type: ''}) {
-    return _put('$index/_mapping/$type', mapping);
-  }
+  Future putMapping(Map<String, dynamic> mapping, {String index: '_all', String type: ''}) =>
+    elasticRequest.put('$index/_mapping/$type', mapping);
 
   /// Retrieve mapping definitions for an [index] or index/type.
   /// Gets all the mappings if _all is passed.
@@ -109,9 +107,8 @@ class ElasticSearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-mapping.html)
-  Future getMapping({String index: '_all', String type: ''}) {
-    return _get('$index/_mapping/$type');
-  }
+  Future getMapping({String index: '_all', String type: ''}) =>
+    elasticRequest.get('$index/_mapping/$type');
 
   /// Perform many index, delete, create, or update operations in a single call.
   ///
@@ -147,34 +144,6 @@ class ElasticSearch {
     // Elasticsearch needs maps to be on new lines. Last line needs
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';
-
-    return _post('$index/$type/_bulk', body);
-  }
-
-  Future _get(String path) => _request('GET', path);
-  Future _post(String path, body) => _request('POST', path, body);
-  Future _put(String path, body) => _request('PUT', path, body);
-  Future _delete(String path) => _request('DELETE', path);
-
-  Future _request(String method, String path, [body]) async {
-    var request = new http.Request(method, Uri.parse('$host/$path'));
-    if (body != null) {
-      if (body is! String) {
-        body = JSON.encode(body);
-      }
-      request.body = body;
-    }
-
-    var response = await request.send();
-    var responseBody = _responseDecoder.convert(await response.stream.toBytes());
-
-    if (response.statusCode >= 400) {
-      if (responseBody['error'].startsWith('IndexMissingException')) {
-        throw new IndexMissingException(responseBody);
-      }
-      throw new ElasticSearchException(responseBody);
-    }
-
-    return responseBody;
+    return elasticRequest.post('$index/$type/_bulk', body);
   }
 }

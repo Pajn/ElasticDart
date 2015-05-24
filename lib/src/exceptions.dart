@@ -1,19 +1,22 @@
 part of elastic_dart;
 
-final _indexMissing = new RegExp(r'IndexMissingException\[\[(\w+)\] missing\]');
+final _indexMissing = new RegExp(r'IndexMissingException\[\[([^\]]+)\] missing\]');
+String _missingIndex(String error) => _indexMissing.firstMatch(error).group(1);
 
-class ElasticSearchException implements Exception {
+class ElasticsearchException implements Exception {
   final String message;
   final int status;
   final Map response;
 
-  ElasticSearchException(Map response, [String message]) :
+  ElasticsearchException(Map response, [String message]) :
     this.message = (message == null) ? response['error'] : message,
     this.status = response['status'],
     this.response = response;
+
+  String toString() => message;
 }
 
-class IndexAlreadyExistsException extends ElasticSearchException {
+class IndexAlreadyExistsException extends ElasticsearchException {
   final String index;
 
   IndexAlreadyExistsException(String index, Map response) :
@@ -21,10 +24,10 @@ class IndexAlreadyExistsException extends ElasticSearchException {
     super(response, 'Index [$index] already exists');
 }
 
-class IndexMissingException extends ElasticSearchException {
+class IndexMissingException extends ElasticsearchException {
   final String index;
 
   IndexMissingException(Map response) :
-    this.index = _indexMissing.firstMatch(response['error']).group(1),
-    super(response, 'Index [${_indexMissing.firstMatch(response['error']).group(1)}] does not exist');
+    this.index = _missingIndex(response['error']),
+    super(response, 'Index [${_missingIndex(response['error'])}] does not exist');
 }

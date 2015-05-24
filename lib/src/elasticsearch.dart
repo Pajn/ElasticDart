@@ -2,27 +2,28 @@ part of elastic_dart;
 
 final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
 
-class ElasticSearch {
+/// A wrapper around the Elasticsearch REST API.
+class Elasticsearch {
   /// The address of the ElasticSearch REST API.
   final elasticRequest;
 
-  ElasticSearch([String host = 'http://127.0.0.1:9200']):
+  Elasticsearch([String host = 'http://127.0.0.1:9200']):
                 elasticRequest = new ElasticRequest(host);
 
   /// Creates an index with the given [name] with optional [settings].
   ///
   /// Examples:
   /// ```dart
-  ///   // Creates an index called "movie-index" without any settings.
-  ///   await elasticsearch.createIndex('movie-index');
+  /// // Creates an index called "movie-index" without any settings.
+  /// await elasticsearch.createIndex('movie-index');
   ///
-  ///   // Creates an index called "movie-index" with 3 shards, each with 2 replicas.
-  ///   await elasticsearch.createIndex('movie-index', {
-  ///     "settings" : {
-  ///       "number_of_shards" : 3,
-  ///       "number_of_replicas" : 2
-  ///       }
-  ///    });
+  /// // Creates an index called "movie-index" with 3 shards, each with 2 replicas.
+  /// await elasticsearch.createIndex('movie-index', {
+  ///   "settings" : {
+  ///     "number_of_shards" : 3,
+  ///     "number_of_replicas" : 2
+  ///   }
+  /// });
   /// ```
   ///
   /// For more information see:
@@ -30,7 +31,7 @@ class ElasticSearch {
   Future createIndex(String name, {Map settings: const {}, bool throwIfExists: true}) async {
     try {
       return await elasticRequest.put(name, settings);
-    } on ElasticSearchException catch(e) {
+    } on ElasticsearchException catch(e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
         if (throwIfExists) throw new IndexAlreadyExistsException(name, e.response);
         return e.response;
@@ -43,11 +44,11 @@ class ElasticSearch {
   ///
   /// Examples:
   /// ```dart
-  ///   // Deletes the movie index.
-  ///   await elasticsearch.deleteIndex('movie-index');
+  /// // Deletes the movie index.
+  /// await elasticsearch.deleteIndex('movie-index');
   ///
-  ///   // Deletes all the indexes. Be careful with this!
-  ///   await elasticsearch.deleteIndex('_all');
+  /// // Deletes all the indexes. Be careful with this!
+  /// await elasticsearch.deleteIndex('_all');
   /// ```
   ///
   /// For more information see:
@@ -58,18 +59,18 @@ class ElasticSearch {
   ///
   /// Examples:
   /// ```dart
-  ///   // Will search all indices and matches everything.
-  ///   await elasticsearch.search();
+  /// // Will search all indices and matches everything.
+  /// await elasticsearch.search();
   ///
-  ///   // Search the movie index that matches everything.
-  ///   await elasticsearch.search(index: 'movie-index');
+  /// // Search the movie index that matches everything.
+  /// await elasticsearch.search(index: 'movie-index');
   ///
-  ///   // Search the movies index that matches the name with Fury.
-  ///   await elasticsearch.search(index: 'movie-index', query: {
-  ///     "query": {
-  ///       "match": {"name": "Fury"}
-  ///     }
-  ///   });
+  /// // Search the movies index that matches the name with Fury.
+  /// await elasticsearch.search(index: 'movie-index', query: {
+  ///   "query": {
+  ///     "match": {"name": "Fury"}
+  ///   }
+  /// });
   /// ```
   ///
   /// For more information see:
@@ -82,10 +83,10 @@ class ElasticSearch {
   ///
   /// Examples:
   /// ```dart
-  ///   await es.putMapping(
-  ///     {"test-type": {"properties": {"message": {"type": "string", "store": "yes"}}}},
-  ///     index: 'movie-index', type: 'movie-type'
-  ///   );
+  /// await es.putMapping(
+  ///   {"test-type": {"properties": {"message": {"type": "string", "store": "yes"}}}},
+  ///   index: 'movie-index', type: 'movie-type'
+  /// );
   /// ```
   ///
   /// For more information see:
@@ -98,11 +99,11 @@ class ElasticSearch {
   ///
   /// Examples:
   /// ```dart
-  ///   // Get all the mappings on the specific index.
-  ///   await es.getMapping(index: 'movie-index');
+  /// // Get all the mappings on the specific index.
+  /// await es.getMapping(index: 'movie-index');
   ///
-  ///   // Get mapping on the index and the specific type.
-  ///   await es.getMapping(index: 'movie-index', type: 'movie-type');
+  /// // Get mapping on the index and the specific type.
+  /// await es.getMapping(index: 'movie-index', type: 'movie-type');
   /// ```
   ///
   /// For more information see:
@@ -114,28 +115,28 @@ class ElasticSearch {
   ///
   /// Examples:
   /// ```dart
-  ///   await es.bulk([
-  ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "1"} },
-  ///     {"name": "Fury", "year": "2014" }
-  ///   ]);
+  /// await es.bulk([
+  ///   {"index": {"_index": "movie-index", "_type": "movies", "_id": "1"} },
+  ///   {"name": "Fury", "year": "2014" }
+  /// ]);
   ///
-  ///   await es.bulk([
-  ///     {"delete": {"_index": "movie-index", "_type": "movies", "_id": "2"} },
-  ///   ]);
+  /// await es.bulk([
+  ///   {"delete": {"_index": "movie-index", "_type": "movies", "_id": "2"} },
+  /// ]);
   ///
-  ///   await es.bulk([
-  ///     {"create": {"_index": "movie-index", "_type": "movies", "_id": "3"} },
-  ///     {"name": "Fury", "year": "2014" }
-  ///   ]);
+  /// await es.bulk([
+  ///   {"create": {"_index": "movie-index", "_type": "movies", "_id": "3"} },
+  ///   {"name": "Fury", "year": "2014" }
+  /// ]);
   ///
-  ///   await es.bulk([
-  ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "1"} },
-  ///     {"name": "Fury", "year": "2014" }
-  ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "2"} },
-  ///     {"name": "Titanic", "year": "1997" },
-  ///     {"index": {"_index": "movie-index", "_type": "movies", "_id": "3"} },
-  ///     {"name": "Annabelle", "year": "2014" }
-  ///   ]);
+  /// await es.bulk([
+  ///   {"index": {"_index": "movie-index", "_type": "movies", "_id": "1"} },
+  ///   {"name": "Fury", "year": "2014" },
+  ///   {"index": {"_index": "movie-index", "_type": "movies", "_id": "2"} },
+  ///   {"name": "Titanic", "year": "1997" },
+  ///   {"index": {"_index": "movie-index", "_type": "movies", "_id": "3"} },
+  ///   {"name": "Annabelle", "year": "2014" }
+  /// ]);
   /// ```
   ///
   /// For more information see:
@@ -144,6 +145,5 @@ class ElasticSearch {
     // Elasticsearch needs maps to be on new lines. Last line needs
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';
-    return elasticRequest.post('$index/$type/_bulk', body);
   }
 }

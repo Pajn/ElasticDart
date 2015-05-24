@@ -67,7 +67,7 @@ main() {
     });
 
     it('should be able to use a custom index name', () async {
-      session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+      await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         'movies': {
           Movie: (Movie movie) => {'title': movie.title}
         },
@@ -90,7 +90,7 @@ main() {
     });
 
     it('should be able to use a custom index name with combined indexes', () async {
-      session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+      await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         'movies': {
           Cinema: (Cinema cinema) => {'name': cinema.name},
           Movie: (Movie movie) => {'title': movie.title}
@@ -105,7 +105,7 @@ main() {
     });
 
     it('should be able to use combined indexes', () async {
-      session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+      await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         [Cinema, Movie]: fullDocument(),
       }));
 
@@ -117,7 +117,7 @@ main() {
     });
 
     it('should be able to use combined indexes with individual format', () async {
-      session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+      await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         [Cinema, Movie]: {
           Cinema: (Cinema cinema) => {'name': cinema.name},
           Movie: (Movie movie) => {'title': movie.title}
@@ -132,7 +132,7 @@ main() {
     });
 
     it('should map GeoPoints', () async {
-      session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+      await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         Cinema: fullDocument(),
       }));
 
@@ -147,7 +147,7 @@ main() {
 
     describe('mirroring', () {
       beforeEach(() async {
-        session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
+        await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
           Movie: (Movie movie) => {'title': movie.title},
         }));
 
@@ -166,7 +166,7 @@ main() {
       it('should be able to search for updated movies', () async {
         avatar.title = 'Avatar - bill';
         session.store(avatar);
-        session.saveChanges();
+        await session.saveChanges();
         // wait for the changes to be persisted
         await new Future.delayed(new Duration(seconds: 2));
 
@@ -181,7 +181,7 @@ main() {
 
       it('should not be able to search for deleted movies', () async {
         session.delete(killBill);
-        session.saveChanges();
+        await session.saveChanges();
         // wait for the changes to be persisted
         await new Future.delayed(new Duration(seconds: 2));
 

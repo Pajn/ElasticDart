@@ -1,14 +1,12 @@
 part of elastic_dart;
 
-final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
-
 /// A wrapper around the Elasticsearch REST API.
 class Elasticsearch {
   /// The address of the ElasticSearch REST API.
   final elasticRequest;
 
-  Elasticsearch([String host = 'http://127.0.0.1:9200']):
-                elasticRequest = new ElasticRequest(host);
+  Elasticsearch([String host = 'http://127.0.0.1:9200'])
+      : elasticRequest = new ElasticRequest(host);
 
   /// Creates an index with the given [name] with optional [settings].
   ///
@@ -28,12 +26,14 @@ class Elasticsearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
-  Future createIndex(String name, {Map settings: const {}, bool throwIfExists: true}) async {
+  Future createIndex(String name,
+      {Map settings: const {}, bool throwIfExists: true}) async {
     try {
       return await elasticRequest.put(name, settings);
-    } on ElasticsearchException catch(e) {
+    } on ElasticsearchException catch (e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
-        if (throwIfExists) throw new IndexAlreadyExistsException(name, e.response);
+        if (throwIfExists) throw new IndexAlreadyExistsException(
+            name, e.response);
         return e.response;
       }
       rethrow;
@@ -75,9 +75,9 @@ class Elasticsearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
-  Future<Map<String, dynamic>> search({String index: '_all', Map<String, dynamic> query: const {}}) =>
-    elasticRequest.post('$index/_search', query);
-
+  Future<Map<String, dynamic>> search(
+          {String index: '_all', Map<String, dynamic> query: const {}}) =>
+      elasticRequest.post('$index/_search', query);
 
   /// Register specific [mapping] definition for a specific [type].
   ///
@@ -91,8 +91,9 @@ class Elasticsearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-put-mapping.html)
-  Future putMapping(Map<String, dynamic> mapping, {String index: '_all', String type: ''}) =>
-    elasticRequest.put('$index/_mapping/$type', mapping);
+  Future putMapping(Map<String, dynamic> mapping,
+          {String index: '_all', String type: ''}) =>
+      elasticRequest.put('$index/_mapping/$type', mapping);
 
   /// Retrieve mapping definitions for an [index] or index/type.
   /// Gets all the mappings if _all is passed.
@@ -109,7 +110,7 @@ class Elasticsearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-mapping.html)
   Future getMapping({String index: '_all', String type: ''}) =>
-    elasticRequest.get('$index/_mapping/$type');
+      elasticRequest.get('$index/_mapping/$type');
 
   /// Perform many index, delete, create, or update operations in a single call.
   ///
@@ -145,5 +146,6 @@ class Elasticsearch {
     // Elasticsearch needs maps to be on new lines. Last line needs
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';
+    return elasticRequest.post('$index/$type/_bulk', body);
   }
 }

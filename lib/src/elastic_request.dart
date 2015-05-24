@@ -1,5 +1,7 @@
 part of elastic_dart;
 
+final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
+
 class ElasticRequest {
   final String host;
 
@@ -26,7 +28,7 @@ class ElasticRequest {
       if (responseBody['error'].startsWith('IndexMissingException')) {
         throw new IndexMissingException(responseBody);
       }
-      throw new ElasticSearchException(responseBody);
+      throw new ElasticsearchException(responseBody);
     }
 
     return responseBody;

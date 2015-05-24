@@ -47,5 +47,5 @@ For usage on the Warehouse adapter see the [example folder][].
 Please file feature requests and bugs at the [issue tracker][tracker].
 
 [Warehouse]: https://pub.dartlang.org/packages/warehouse
-[example folder]: 
+[example folder]: https://github.com/Pajn/ElasticDart/tree/master/example
 [tracker]: https://github.com/Pajn/ElasticDart/issues

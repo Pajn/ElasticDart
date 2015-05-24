@@ -42,14 +42,15 @@ typedef Map<String, dynamic> SearchSerializer(entity);
 ///   }}
 ///   ```
 Companion elasticsearchCompanion(Elasticsearch db, Map indexDefinitions,
-                                 {Duration bulkTime: const Duration(milliseconds: 250)}) {
+    {Duration bulkTime: const Duration(milliseconds: 250)}) {
   var companion = new _ElasticsearchCompanion(db, bulkTime);
   companion.setUpMappings(indexDefinitions);
   return companion.setSession;
 }
 
 /// Serializes the complete and all referenced objects
-SearchSerializer fullDocument() => (entity) => lookingGlass.serializeDocument(entity);
+SearchSerializer fullDocument() =>
+    (entity) => lookingGlass.serializeDocument(entity);
 
 class _Index {
   String name;

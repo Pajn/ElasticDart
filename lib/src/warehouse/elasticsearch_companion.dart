@@ -20,9 +20,11 @@ class _ElasticsearchCompanion {
       .listen(bulk.add);
   }
 
-  setSession(DbSession session) {
+  setSession(DbSession session) async {
     if (this.session != null) throw new StateError('Can only set the session once');
     this.session = session;
+
+    await Future.wait(_allMappings);
 
     for (var index in indexes) {
       Stream<DbOperation> indexOperations = session.onOperation

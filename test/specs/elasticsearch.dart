@@ -18,6 +18,48 @@ main() {
 
   describe('Elasticsearch', () {
 
+    describe('getIndex', () {
+      it('should be able to get a single index with all features', () async {
+        await es.createIndex('test-index');
+
+        var result = await es.getIndex('test-index');
+
+        expect(result).toContain('test-index');
+        expect(result['test-index']).toContain('settings');
+        expect(result['test-index']).toContain('mappings');
+        expect(result['test-index']).toContain('warmers');
+        expect(result['test-index']).toContain('aliases');
+
+        await es.deleteIndex('test-index');
+      });
+
+      it('should be able to get a single index with a single feature', () async {
+        await es.createIndex('test-index');
+
+        var result = await es.getIndex('test-index', features: '_settings');
+
+        expect(result['test-index']).toContain('settings');
+        expect(result['test-index']['mappings']).toBeNull();
+        expect(result['test-index']['warmers']).toBeNull();
+        expect(result['test-index']['aliases']).toBeNull();
+
+        await es.deleteIndex('test-index');
+      });
+
+      it('should be able to get all indices', () async {
+        await es.createIndex('first-index');
+        await es.createIndex('second-index');
+
+        var result = await es.getIndex('_all');
+
+        expect(result).toContain('first-index');
+        expect(result).toContain('second-index');
+
+        await es.deleteIndex('first-index');
+        await es.deleteIndex('second-index');
+      });
+    });
+
     describe('search', () {
       it('should be able to search the whole database with a query', () async {
         var query = {

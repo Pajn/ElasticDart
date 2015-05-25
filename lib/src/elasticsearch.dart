@@ -40,6 +40,26 @@ class Elasticsearch {
     }
   }
 
+  /// Retrieve information about one or more indices by [name].
+  ///
+  /// Examples:
+  /// ```dart
+  ///   // Gets the movie index.
+  ///   await elasticsearch.getIndex('movie-index');
+  ///
+  ///   // Gets all the indices.
+  ///   await elasticsearch.getIndex('_all');
+  ///
+  ///   // Gets a single index with a single feature.
+  ///   await elasticsearch.getIndex('movie-index', features: '_settings');
+  /// ```
+  ///
+  /// For more information see:
+  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-index.html)
+  Future getIndex(String name, {String features: ''}) {
+    return elasticRequest.get('$name/$features');
+  }
+
   /// Deletes an index by [name] or all indices if _all is passed.
   ///
   /// Examples:

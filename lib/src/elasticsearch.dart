@@ -67,7 +67,7 @@ class Elasticsearch {
   /// // Deletes the movie index.
   /// await elasticsearch.deleteIndex('movie-index');
   ///
-  /// // Deletes all the indexes. Be careful with this!
+  /// // Deletes all the indices. Be careful with this!
   /// await elasticsearch.deleteIndex('_all');
   /// ```
   ///

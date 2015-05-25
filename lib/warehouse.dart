@@ -18,7 +18,7 @@ typedef Map<String, dynamic> SearchSerializer(entity);
 /// Configures and creates an ElasticsearchCompanion
 ///
 /// [db] is the [Elasticsearch] endpoint that will be searched against
-/// [indexDefinitions] is a [Map] that configures the indexes and how the entities should be
+/// [indexDefinitions] is a [Map] that configures the indices and how the entities should be
 /// serialized for search, it can be in the formats:
 ///
 /// - Single type per index with derived index name

@@ -2,7 +2,7 @@ part of elastic_dart.warehouse;
 
 class _ElasticsearchCompanion {
   final Elasticsearch db;
-  final List<_Index> indexes = [];
+  final List<_Index> indices = [];
   final List<Future> _allMappings = [];
   final StreamController bulkOperations = new StreamController();
   final Duration bulkTime;
@@ -26,7 +26,7 @@ class _ElasticsearchCompanion {
 
     await Future.wait(_allMappings);
 
-    for (var index in indexes) {
+    for (var index in indices) {
       Stream<DbOperation> indexOperations = session.onOperation
         .where((op) => isAny(op.entity, index.converters.keys));
 
@@ -75,7 +75,7 @@ class _ElasticsearchCompanion {
         throw 'The key in indexDefinitions must either be a String, Type or List<Type>';
       }
 
-      indexes.add(indexDefinition);
+      indices.add(indexDefinition);
 
       _allMappings.add(() async {
         await db.createIndex(indexDefinition.name, throwIfExists: false);

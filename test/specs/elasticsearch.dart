@@ -74,7 +74,7 @@ main() {
         // We have two movies with the same name
         expect(result['hits']['total']).toEqual(3);
 
-        // Expect our indexes to exist
+        // Expect our indices to exist
         expect(result['hits']['hits'][0]['_index']).toEqual(firstIndex);
         expect(result['hits']['hits'][1]['_index']).toEqual(secondIndex);
 
@@ -88,7 +88,7 @@ main() {
         var result = await es.search();
         expect(result['_shards']).toBeNotNull();
 
-        // Expect our indexes to exist
+        // Expect our indices to exist
         expect(result['hits']['hits'][0]['_index']).toEqual(firstIndex);
         expect(result['hits']['hits'][2]['_index']).toEqual(secondIndex);
 

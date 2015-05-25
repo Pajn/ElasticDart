@@ -89,7 +89,7 @@ main() {
         });
     });
 
-    it('should be able to use a custom index name with combined indexes', () async {
+    it('should be able to use a custom index name with combined indices', () async {
       await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         'movies': {
           Cinema: (Cinema cinema) => {'name': cinema.name},
@@ -104,7 +104,7 @@ main() {
       expect(entities[1].title).toEqual('The Hobbit: An Unexpected Journey');
     });
 
-    it('should be able to use combined indexes', () async {
+    it('should be able to use combined indices', () async {
       await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         [Cinema, Movie]: fullDocument(),
       }));
@@ -116,7 +116,7 @@ main() {
       expect(entities[1].title).toEqual('The Hobbit: An Unexpected Journey');
     });
 
-    it('should be able to use combined indexes with individual format', () async {
+    it('should be able to use combined indices with individual format', () async {
       await session.registerCompanion(Elasticsearch, elasticsearchCompanion(es, {
         [Cinema, Movie]: {
           Cinema: (Cinema cinema) => {'name': cinema.name},

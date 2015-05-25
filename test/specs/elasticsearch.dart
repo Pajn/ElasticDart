@@ -139,6 +139,17 @@ main() {
         expect(result).toEqual({'acknowledged': true});
       });
 
+      it('should be able to create a new index with features', () async {
+         var result = await es.createIndex('movie-index', features: {
+           "settings" : {
+             "number_of_shards" : 3,
+             "number_of_replicas" : 2
+             }
+          });
+         expect(result).toEqual({'acknowledged': true});
+         es.deleteIndex('movie-index');
+      });
+
       it('should throw if the index exists', () {
         es.createIndex(firstIndex)
           .then((_) => throw 'Should throw')

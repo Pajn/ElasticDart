@@ -8,28 +8,28 @@ class Elasticsearch {
   Elasticsearch([String host = 'http://127.0.0.1:9200'])
       : elasticRequest = new ElasticRequest(host);
 
-  /// Creates an index with the given [name] with optional [settings].
+  /// Creates an index with the given [name] with optional [features].
   ///
   /// Examples:
   /// ```dart
-  /// // Creates an index called "movie-index" without any settings.
-  /// await elasticsearch.createIndex('movie-index');
+  ///   // Creates an index called "movie-index" without any features.
+  ///   await elasticsearch.createIndex('movie-index');
   ///
-  /// // Creates an index called "movie-index" with 3 shards, each with 2 replicas.
-  /// await elasticsearch.createIndex('movie-index', {
-  ///   "settings" : {
-  ///     "number_of_shards" : 3,
-  ///     "number_of_replicas" : 2
-  ///   }
-  /// });
+  ///   // Creates an index called "movie-index" with 3 shards, each with 2 replicas.
+  ///   await elasticsearch.createIndex('movie-index', features: {
+  ///     "settings" : {
+  ///       "number_of_shards" : 3,
+  ///       "number_of_replicas" : 2
+  ///       }
+  ///    });
   /// ```
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
   Future createIndex(String name,
-      {Map settings: const {}, bool throwIfExists: true}) async {
+      {Map features: const {}, bool throwIfExists: true}) async {
     try {
-      return await elasticRequest.put(name, settings);
+      return await elasticRequest.put(name, features);
     } on ElasticsearchException catch (e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
         if (throwIfExists) throw new IndexAlreadyExistsException(

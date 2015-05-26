@@ -1,5 +1,5 @@
 name: elastic_dart
-version: 0.2.0
+version: 0.2.1
 description: An Elasticsearch connector for Dart
 homepage: https://github.com/Pajn/ElasticDart
 authors:

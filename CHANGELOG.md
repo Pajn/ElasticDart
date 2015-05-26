@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+- perf(tests): Stop creating/deleting new indices in each test
+- refactor: Renaming settings to features (createIndex)
+- style: Changed indexes to indices (internal names)
+- feat: Retrieve information about one or more indices
+
 ## 0.2.0
 - style: Rename ElasticSearch to Elasticsearch
 - feat: Add initial Warehouse companion adapter

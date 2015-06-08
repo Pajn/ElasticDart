@@ -32,16 +32,16 @@ main(Elasticsearch es) {
       });
 
       it('should be able to create a new index', () async {
-        var result = await es.createIndex('new-index');
-        expect(result).toEqual({'acknowledged': true});
+        var index = await es.createIndex('new-index');
+        expect(index.name).toEqual('new-index');
       });
 
       it('should be able to create a new index with features', () async {
-        var result = await es.createIndex('new-index',
+        var index = await es.createIndex('new-index',
             features: {
           "settings": {"number_of_shards": 3, "number_of_replicas": 2}
         });
-        expect(result).toEqual({'acknowledged': true});
+        expect(index.name).toEqual('new-index');
       });
 
       it('should throw if the index exists', () {
@@ -55,8 +55,9 @@ main(Elasticsearch es) {
       });
 
       it('should not throw if the index exists and its told so', () async {
-        var result = await es.createIndex(firstIndex, throwIfExists: false);
-        expect(result).toBeA(Index);
+        var index = await es.createIndex(firstIndex, throwIfExists: false);
+        expect(index).toBeA(Index);
+        expect(index.name).toEqual(firstIndex);
       });
     });
   });

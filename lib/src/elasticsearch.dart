@@ -32,7 +32,8 @@ class Elasticsearch {
   Future<Index> createIndex(String name,
       {Map features: const {}, bool throwIfExists: true}) async {
     try {
-      return await transport.put(name, features);
+      await transport.put(name, features);
+      return new Index(name, this);
     } on ElasticsearchException catch (e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
         if (throwIfExists) throw new IndexAlreadyExistsException(

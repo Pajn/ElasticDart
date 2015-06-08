@@ -34,11 +34,13 @@ main() {
     }
 
     beforeEach(() async {
-      await es.deleteIndex('_all');
+      await es.all.delete();
       session = new MockSession();
       cinemaRepository = new CinemaRepository(session);
-      combinedRepository = new GenericRepository(session, const [Cinema, Movie]);
-      customCombinedIndex = new CustomGenericIndex(session, const [Cinema, Movie]);
+      combinedRepository =
+          new GenericRepository(session, const [Cinema, Movie]);
+      customCombinedIndex =
+          new CustomGenericIndex(session, const [Cinema, Movie]);
       customMovieIndex = new CustomMovieIndex(session);
       movieRepository = new MovieRepository(session);
 
@@ -82,11 +84,12 @@ main() {
         'Kill Bill - Vol. 2',
       ]);
 
-      await movieRepository.search('Bill')
-        .then((_) => 'Should have thrown')
-        .catchError((e) {
-          expect(e).toBeA(IndexMissingException);
-        });
+      await movieRepository
+          .search('Bill')
+          .then((_) => 'Should have thrown')
+          .catchError((e) {
+        expect(e).toBeA(IndexMissingException);
+      });
     });
 
     it('should be able to use a custom index name with combined indices', () async {

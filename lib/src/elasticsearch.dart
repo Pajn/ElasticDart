@@ -2,11 +2,14 @@ part of elastic_dart;
 
 /// A wrapper around the Elasticsearch REST API.
 class Elasticsearch {
-  /// The address of the ElasticSearch REST API.
-  final elasticRequest;
+  final transport;
+
+  Index get all => new Index('_all', this);
 
   Elasticsearch([String host = 'http://127.0.0.1:9200', http.Client client])
-      : elasticRequest = new ElasticRequest(host, client: client);
+      : transport = new ElasticRequest(host, client: client);
+
+  Index index(String name) => new Index(name, this);
 
   /// Creates an index with the given [name] with optional [features].
   ///
@@ -26,111 +29,19 @@ class Elasticsearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-create-index.html)
-  Future createIndex(String name,
+  Future<Index> createIndex(String name,
       {Map features: const {}, bool throwIfExists: true}) async {
     try {
-      return await elasticRequest.put(name, features);
+      return await transport.put(name, features);
     } on ElasticsearchException catch (e) {
       if (e.message.startsWith('IndexAlreadyExistsException')) {
         if (throwIfExists) throw new IndexAlreadyExistsException(
             name, e.response);
-        return e.response;
+        return new Index(name, this);
       }
       rethrow;
     }
   }
-
-  /// Retrieve information about one or more indices by [name].
-  ///
-  /// Examples:
-  /// ```dart
-  ///   // Gets the movie index.
-  ///   await elasticsearch.getIndex('movie-index');
-  ///
-  ///   // Gets all the indices.
-  ///   await elasticsearch.getIndex('_all');
-  ///
-  ///   // Gets a single index with a single feature.
-  ///   await elasticsearch.getIndex('movie-index', features: '_settings');
-  /// ```
-  ///
-  /// For more information see:
-  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-index.html)
-  Future getIndex(String name, {String features: ''}) {
-    return elasticRequest.get('$name/$features');
-  }
-
-  /// Deletes an index by [name] or all indices if _all is passed.
-  ///
-  /// Examples:
-  /// ```dart
-  /// // Deletes the movie index.
-  /// await elasticsearch.deleteIndex('movie-index');
-  ///
-  /// // Deletes all the indices. Be careful with this!
-  /// await elasticsearch.deleteIndex('_all');
-  /// ```
-  ///
-  /// For more information see:
-  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-delete-index.html)
-  Future deleteIndex(String name) => elasticRequest.delete(name);
-
-  /// Searches the given [index] or all indices if _all is passed.
-  ///
-  /// Examples:
-  /// ```dart
-  /// // Will search all indices and matches everything.
-  /// await elasticsearch.search();
-  ///
-  /// // Search the movie index that matches everything.
-  /// await elasticsearch.search(index: 'movie-index');
-  ///
-  /// // Search the movies index that matches the name with Fury.
-  /// await elasticsearch.search(index: 'movie-index', query: {
-  ///   "query": {
-  ///     "match": {"name": "Fury"}
-  ///   }
-  /// });
-  /// ```
-  ///
-  /// For more information see:
-  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
-  Future<Map<String, dynamic>> search(
-          {String index: '_all', Map<String, dynamic> query: const {}}) =>
-      elasticRequest.post('$index/_search', query);
-
-  /// Register specific [mapping] definition for a specific [type].
-  ///
-  /// Examples:
-  /// ```dart
-  /// await es.putMapping(
-  ///   {"test-type": {"properties": {"message": {"type": "string", "store": "yes"}}}},
-  ///   index: 'movie-index', type: 'movie-type'
-  /// );
-  /// ```
-  ///
-  /// For more information see:
-  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-put-mapping.html)
-  Future putMapping(Map<String, dynamic> mapping,
-          {String index: '_all', String type: ''}) =>
-      elasticRequest.put('$index/_mapping/$type', mapping);
-
-  /// Retrieve mapping definitions for an [index] or index/type.
-  /// Gets all the mappings if _all is passed.
-  ///
-  /// Examples:
-  /// ```dart
-  /// // Get all the mappings on the specific index.
-  /// await es.getMapping(index: 'movie-index');
-  ///
-  /// // Get mapping on the index and the specific type.
-  /// await es.getMapping(index: 'movie-index', type: 'movie-type');
-  /// ```
-  ///
-  /// For more information see:
-  ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-get-mapping.html)
-  Future getMapping({String index: '_all', String type: ''}) =>
-      elasticRequest.get('$index/_mapping/$type');
 
   /// Perform many index, delete, create, or update operations in a single call.
   ///
@@ -166,6 +77,6 @@ class Elasticsearch {
     // Elasticsearch needs maps to be on new lines. Last line needs
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';
-    return elasticRequest.post('$index/$type/_bulk', body);
+    return transport.post('$index/$type/_bulk', body);
   }
 }

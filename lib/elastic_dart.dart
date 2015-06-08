@@ -10,5 +10,6 @@ import 'package:http/http.dart' as http;
 part 'src/elastic_request.dart';
 part 'src/elasticsearch.dart';
 part 'src/exceptions.dart';
+part 'src/index.dart';
 
 clientFactory() => new http.Client();

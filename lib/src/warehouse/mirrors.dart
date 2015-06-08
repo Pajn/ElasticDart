@@ -18,4 +18,5 @@ Map findMapping(Type type) {
   return mapping;
 }
 
-bool isAny(Object object, Iterable<Type> types) => types.any((type) => isSubtype(object, type));
+bool isAny(Object object, Iterable<Type> types) =>
+    types.any((type) => isSubtype(object, type));

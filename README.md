@@ -33,13 +33,19 @@ main() async {
   // Wait for Elasticsearch to index the new documents
   await new Future.delayed(new Duration(seconds: 2));
 
-  var result = await es.search(index: 'my_movies', query: {
+  var result = await es.index('my_movies').search(query: {
     "query": {
       "match": {"name": "The hunger games"}
     }
   });
 
   print(result);
+  
+  // Deleting all indices.
+  es.all.delete();
+  
+  // Delete a single index.
+  es.index('my_movies').delete();
 }
 ```
 

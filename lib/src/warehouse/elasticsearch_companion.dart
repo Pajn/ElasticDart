@@ -10,41 +10,55 @@ class _ElasticsearchCompanion {
 
   _ElasticsearchCompanion(this.db, this.bulkTime) {
     var bulk = [];
-    bulkOperations.stream
-      .timeout(bulkTime, onTimeout: (_) {
-        if (bulk.isNotEmpty) {
-          db.bulk(bulk);
-          bulk.clear();
-        }
-      })
-      .listen(bulk.add);
+    bulkOperations.stream.timeout(bulkTime, onTimeout: (_) {
+      if (bulk.isNotEmpty) {
+        db.bulk(bulk);
+        bulk.clear();
+      }
+    }).listen(bulk.add);
   }
 
   setSession(DbSession session) async {
-    if (this.session != null) throw new StateError('Can only set the session once');
+    if (this.session !=
+        null) throw new StateError('Can only set the session once');
     this.session = session;
 
     await Future.wait(_allMappings);
 
     for (var index in indices) {
       Stream<DbOperation> indexOperations = session.onOperation
-        .where((op) => isAny(op.entity, index.converters.keys));
+          .where((op) => isAny(op.entity, index.converters.keys));
 
       indexOperations
-        .where((op) => op.type == OperationType.create || op.type == OperationType.update)
-        .listen((op) {
-          var type = index.converters.keys.firstWhere((type) => isSubtype(op.entity, type));
-          var converter = index.converters[type];
-          bulkOperations.add({'index': {'_index': index.name, '_type': findLabel(type), '_id': op.id}});
-          bulkOperations.add(converter(op.entity));
+          .where((op) => op.type == OperationType.create ||
+              op.type == OperationType.update)
+          .listen((op) {
+        var type = index.converters.keys
+            .firstWhere((type) => isSubtype(op.entity, type));
+        var converter = index.converters[type];
+        bulkOperations.add({
+          'index': {
+            '_index': index.name,
+            '_type': findLabel(type),
+            '_id': op.id
+          }
         });
+        bulkOperations.add(converter(op.entity));
+      });
 
       indexOperations
-        .where((op) => op.type == OperationType.delete)
-        .listen((op) {
-          var type = index.converters.keys.firstWhere((type) => isSubtype(op.entity, type));
-          bulkOperations.add({'delete': {'_index': index.name, '_type': findLabel(type), '_id': op.id}});
+          .where((op) => op.type == OperationType.delete)
+          .listen((op) {
+        var type = index.converters.keys
+            .firstWhere((type) => isSubtype(op.entity, type));
+        bulkOperations.add({
+          'delete': {
+            '_index': index.name,
+            '_type': findLabel(type),
+            '_id': op.id
+          }
         });
+      });
     }
 
     return db;
@@ -66,7 +80,8 @@ class _ElasticsearchCompanion {
           indexDefinition.converters = converters;
         } else {
           indexDefinition.converters = {};
-          index.forEach((index) => indexDefinition.converters[index] = converters);
+          index.forEach(
+              (index) => indexDefinition.converters[index] = converters);
         }
       } else if (index is String) {
         indexDefinition.name = index;
@@ -81,18 +96,14 @@ class _ElasticsearchCompanion {
         await db.createIndex(indexDefinition.name, throwIfExists: false);
 
         await new Stream.fromIterable(indexDefinition.converters.keys)
-          .asyncMap((type) async {
-            var mapping = findMapping(type);
-            if (mapping.isEmpty) return;
-            var label = findLabel(type);
+            .asyncMap((type) async {
+          var mapping = findMapping(type);
+          if (mapping.isEmpty) return;
+          var label = findLabel(type);
 
-            await db.putMapping(
-                {label: {'properties': mapping}},
-                index: indexDefinition.name,
-                type: label
-            );
-          })
-          .last;
+          await db.index(indexDefinition.name).putMapping(
+              {label: {'properties': mapping}}, type: label);
+        }).last;
       }());
     });
   }

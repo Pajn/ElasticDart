@@ -10,11 +10,10 @@ abstract class ElasticsearchMixin {
   /// The index it searches, should be overridden if a custom index name is used
   String get esIndexName => types.map(findLabel).join('&').toLowerCase();
 
-
   /// Searches the corresponding index.
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
   Future<QueryResponse> esQuery(Map query, {int skip: 0, int limit: 10}) =>
-    QueryResponse.search(elasticsearch, esIndexName, query, skip, limit);
+      QueryResponse.search(elasticsearch, esIndexName, query, skip, limit);
 }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2
+- feat: Support using the REST API wrapper in the browser
+
 ## 0.2.1
 - perf(tests): Stop creating/deleting new indices in each test
 - refactor: Renaming settings to features (createIndex)

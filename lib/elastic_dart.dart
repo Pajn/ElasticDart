@@ -1,4 +1,6 @@
-/// A warpper around the Elasticsearch REST API for indexing and querying
+/// A wrapper around the Elasticsearch REST API for indexing and querying
+///
+/// For use on the server
 library elastic_dart;
 
 import 'dart:convert';
@@ -8,3 +10,5 @@ import 'package:http/http.dart' as http;
 part 'src/elastic_request.dart';
 part 'src/elasticsearch.dart';
 part 'src/exceptions.dart';
+
+clientFactory() => new http.Client();

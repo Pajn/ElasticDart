@@ -5,8 +5,7 @@ import 'package:unittest/unittest.dart' show expectAsync;
 
 import 'package:elastic_dart/elastic_dart.dart';
 
-main() {
-  var es = new Elasticsearch();
+main(Elasticsearch es) {
   var firstIndex = 'my_movies';
   var secondIndex = 'my_other_movies';
 

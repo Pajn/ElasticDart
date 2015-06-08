@@ -4,8 +4,10 @@ final _responseDecoder = const Utf8Decoder().fuse(const JsonDecoder());
 
 class ElasticRequest {
   final String host;
+  final http.Client client;
 
-  ElasticRequest(this.host);
+  ElasticRequest(this.host, {http.Client client})
+    : this.client = (client == null) ? clientFactory() : client;
 
   Future get(String path) => _request('GET', path);
   Future post(String path, body) => _request('POST', path, body);
@@ -21,7 +23,7 @@ class ElasticRequest {
       request.body = body;
     }
 
-    var response = await request.send();
+    var response = await client.send(request);
     var responseBody = _responseDecoder.convert(await response.stream.toBytes());
 
     if (response.statusCode >= 400) {

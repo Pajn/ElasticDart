@@ -6,6 +6,8 @@ An Elasticsearch connector for Dart.
 Includes both a thin wrapper around the REST API for indexing and querying and
 a [Warehouse][] companion adapter for easily adding search and ranking to repositories.
 
+The REST API wrapper can be used in the browser by importing `package:elastic_dart/browser_client.dart`.
+
 ## Usage
 A simple usage example:
 ```dart

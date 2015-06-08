@@ -5,8 +5,8 @@ class Elasticsearch {
   /// The address of the ElasticSearch REST API.
   final elasticRequest;
 
-  Elasticsearch([String host = 'http://127.0.0.1:9200'])
-      : elasticRequest = new ElasticRequest(host);
+  Elasticsearch([String host = 'http://127.0.0.1:9200', http.Client client])
+      : elasticRequest = new ElasticRequest(host, client: client);
 
   /// Creates an index with the given [name] with optional [features].
   ///

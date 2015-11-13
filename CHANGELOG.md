@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.3
+- fix: error handling for Elasticsearch 2
+
 ## 0.2.2
 - feat: Support using the REST API wrapper in the browser
 

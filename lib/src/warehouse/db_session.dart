@@ -1,7 +1,7 @@
 part of elastic_dart.warehouse;
 
-class ElasticsearchDbSession extends DbSessionBase<Elasticsearch> {
-  final String index;
+class ElasticSession extends DbSessionBase<Elasticsearch> {
+  final Map<Type, String> indices;
 
   @override
   final Elasticsearch db;
@@ -9,40 +9,45 @@ class ElasticsearchDbSession extends DbSessionBase<Elasticsearch> {
   @override
   final LookingGlass lookingGlass = new LookingGlass();
 
-  ElasticsearchDbSession(this.db, {this.index});
+  @override
+  final supportsListsAsProperty = false;
+
+  ElasticSession(this.db, {this.indices});
 
   @override
   writeQueue() async {
     final operations = queue.expand((operation) {
       final type = findLabel(operation.entity.runtimeType);
-      final index = this.index ?? type;
+      final index = indices[operation.entity.runtimeType] ?? type.toLowerCase();
 
       switch (operation.type) {
         case OperationType.create:
           return [
-            {'create': {'_index': index, 'type': type}},
+            {'create': {'_index': index, '_type': type}},
             lookingGlass.serializeDocument(operation.entity),
           ];
 
         case OperationType.update:
           return [
-            {'index': {'_id': operation.id, '_index': index, 'type': type}},
+            {'index': {'_id': operation.id, '_index': index, '_type': type}},
             lookingGlass.serializeDocument(operation.entity),
           ];
 
         case OperationType.delete:
           return [
-            {'delete': {'_id': operation.id, '_index': index, 'type': type}},
+            {'delete': {'_id': operation.id, '_index': index, '_type': type}},
           ];
       }
     });
 
-    final response = await db.bulk(operations);
+    if (operations.isEmpty) return;
+
+    final response = await db.bulk(operations, refresh: true);
     final items = response['items'];
 
     for (var i = 0; i < items.length; i++) {
-      if (operations[i].type == OperationType.create) {
-        operations[i].id = items[i]['create']['_id'];
+      if (queue[i].type == OperationType.create) {
+        queue[i].id = items[i]['create']['_id'];
       }
     }
   }

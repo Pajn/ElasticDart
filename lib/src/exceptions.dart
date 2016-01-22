@@ -1,7 +1,15 @@
 part of elastic_dart;
 
 final _indexMissing = new RegExp(r'IndexMissingException\[\[([^\]]+)\] missing\]');
-String _missingIndex(String error) => _indexMissing.firstMatch(error).group(1);
+String _missingIndex(error) {
+  if (error is String) {
+    return _indexMissing.firstMatch(error).group(1);
+  } else if (error is Map) {
+    return error['index'];
+  } else {
+    return 'Unknown Index';
+  }
+}
 
 String _errorMessage(responseError) {
   if (responseError is String) return responseError;

@@ -1,6 +1,15 @@
 import 'package:warehouse/warehouse.dart';
+import 'package:warehouse/adapters/base.dart';
 
-Map createQuery(Map where, [String type]) {
+value(value, LookingGlass lg) {
+  var converter = lg.convertedTypes[value.runtimeType];
+  if (converter != null) {
+    return converter.toDatabase(value);
+  }
+  return value;
+}
+
+Map createQuery(LookingGlass lg, Map where, [String type]) {
   var filters = [];
 
   if (where != null && where.isNotEmpty) {
@@ -9,7 +18,7 @@ Map createQuery(Map where, [String type]) {
         value = new EqualsMatcher()..expected = value;
       }
 
-      filters.add(visitMatcher(property, value));
+      filters.add(visitMatcher(property, value, lg));
     });
   }
 
@@ -28,13 +37,15 @@ Map createQuery(Map where, [String type]) {
   }
 
   return {
-    'bool': {
-      'must': filters,
+    'query': {
+      'bool': {
+        'must': filters,
+      }
     }
   };
 }
 
-Map visitMatcher(String property, Matcher matcher) {
+Map visitMatcher(String property, Matcher matcher, LookingGlass lg) {
   if (matcher is ExistMatcher) {
     return {
       'exists': {
@@ -44,7 +55,7 @@ Map visitMatcher(String property, Matcher matcher) {
   } else if (matcher is NotMatcher) {
     return {
       'bool': {
-        'must_not': visitMatcher(property, matcher.invertedMatcher),
+        'must_not': visitMatcher(property, matcher.invertedMatcher, lg),
       }
     };
     //  } else if (matcher is ListContainsMatcher) {
@@ -60,14 +71,14 @@ Map visitMatcher(String property, Matcher matcher) {
   } else if (matcher is EqualsMatcher) {
     return {
       'match': {
-        property: matcher.expected,
+        property: value(matcher.expected, lg),
       }
     };
   } else if (matcher is LessThanMatcher) {
     return {
       'range': {
         property: {
-          'lt': matcher.expected,
+          'lt': value(matcher.expected, lg),
         }
       }
     };
@@ -75,7 +86,7 @@ Map visitMatcher(String property, Matcher matcher) {
     return {
       'range': {
         property: {
-          'lte': matcher.expected,
+          'lte': value(matcher.expected, lg),
         }
       }
     };
@@ -83,7 +94,7 @@ Map visitMatcher(String property, Matcher matcher) {
     return {
       'range': {
         property: {
-          'gt': matcher.expected,
+          'gt': value(matcher.expected, lg),
         }
       }
     };
@@ -91,7 +102,7 @@ Map visitMatcher(String property, Matcher matcher) {
     return {
       'range': {
         property: {
-          'gte': matcher.expected,
+          'gte': value(matcher.expected, lg),
         }
       }
     };
@@ -99,15 +110,15 @@ Map visitMatcher(String property, Matcher matcher) {
     return {
       'range': {
         property: {
-          'gte': matcher.max,
-          'lte': matcher.min,
+          'gte': value(matcher.max, lg),
+          'lte': value(matcher.min, lg),
         }
       }
     };
   } else if (matcher is RegexpMatcher) {
     return {
       'regexp': {
-        property: matcher.regexp,
+        property: value(matcher.regexp, lg),
       }
     };
   } else {

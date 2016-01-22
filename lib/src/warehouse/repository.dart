@@ -1,30 +1,38 @@
 part of elastic_dart.warehouse;
 
-class ElasticsearchRepository<T> extends RepositoryBase<T> {
+class ElasticRepository<T> extends RepositoryBase<T> {
   final String index;
-  final String type;
-  final ElasticsearchDbSession session;
+  final ElasticSession session;
 
-  ElasticsearchRepository(ElasticsearchDbSession session, {String index})
-      : type = findLabel(T),
-        this.index = index ?? session.index ?? findLabel(T),
+  ElasticRepository(ElasticSession session, {String index})
+      : this.index = index ?? findLabel(T).toLowerCase(),
         this.session = session,
         super(session);
+
+  ElasticRepository.withType(ElasticSession session, Type type, {String index})
+      : this.index = index ?? findLabel(type).toLowerCase(),
+        this.session = session,
+        super(session, types: [type]);
 
   @override
   Future<int> countAll({Map where, List<Type> types}) async {
     final response = await session.db.count(
         index: index,
         type: type,
-        query: createQuery(where, type)
+        query: createQuery(session.lookingGlass, where)
     );
 
     return response['count'];
   }
 
   @override
-  Future deleteAll({Map where}) {
+  Future deleteAll({Map where}) async {
     // TODO: implement deleteAll
+    if (where == null || where.isNotEmpty) {
+      try {
+        await session.db.deleteIndex('$index');
+      } on IndexMissingException {}
+    }
   }
 
   @override
@@ -35,7 +43,7 @@ class ElasticsearchRepository<T> extends RepositoryBase<T> {
       String sort,
       List<Type> types
   }) async {
-    final query = createQuery(where, type);
+    final query = createQuery(session.lookingGlass, where);
 
     if (skip != 0) {
       query['from'] = skip;
@@ -49,38 +57,52 @@ class ElasticsearchRepository<T> extends RepositoryBase<T> {
       query['sort'] = [sort];
     }
 
-    final response = await session.db.search(
-        index: index,
-        type: type,
-        query: query
-    );
+//    print(query);
+    try {
+      final response = await session.db.search(
+          index: index,
+          query: query
+      );
 
-    return response['hits'].map(_instantiate).toList();
+  //    print(response);
+  //
+      // print('\n\n\n');
+
+      return response['hits']['hits'].map(_instantiate).toList();
+    } on IndexMissingException {
+      return [];
+    }
   }
 
   @override
   Future<T> get(id) async {
-    final document = await session.db.get(index, type, id);
+    try {
+      final document = await session.db.get(index, '_all', id);
 
-    if (!document['found']) return null;
+      if (!document['found']) return null;
 
-    return _instantiate(document);
+      return _instantiate(document);
+    } on IndexMissingException {}
   }
 
   @override
   Future<List<T>> getAll(Iterable ids) async {
-    final response = await session.db.search(
-        index: index,
-        type: type,
-        query: {
-          'ids' : {
-            'type' : type,
-            'values' : ids.toList(),
+    try {
+      final response = await session.db.search(
+          index: index,
+          query: {
+            'query': {
+              'ids' : {
+                'values' : ids.toList(),
+              }
+            }
           }
-        }
-    );
+      );
 
-    return response['hits'].map(_instantiate).toList();
+      return response['hits']['hits'].map(_instantiate).toList();
+    } on IndexMissingException {
+      return [];
+    }
   }
 
   _instantiate(Map document) {

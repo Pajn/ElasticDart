@@ -29,7 +29,8 @@ class ElasticRequest {
     if (response.statusCode >= 400) {
       var error = responseBody['error'];
       if ((error is String && error.startsWith('IndexMissingException'))
-          || (error is Map && error['type'] == 'index_missing_exception')) {
+          || (error is Map && error['type'] == 'index_missing_exception')
+          || (error is Map && error['type'] == 'index_not_found_exception')) {
         throw new IndexMissingException(responseBody);
       }
       throw new ElasticsearchException(responseBody);

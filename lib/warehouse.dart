@@ -6,11 +6,14 @@ import 'package:warehouse/adapters/base.dart';
 import 'package:warehouse/warehouse.dart';
 
 import 'src/warehouse/mirrors.dart';
+import 'package:elastic_dart/src/warehouse/query_builder.dart';
 
 export 'package:elastic_dart/elastic_dart.dart';
 
+part 'src/warehouse/db_session.dart';
 part 'src/warehouse/elasticsearch_companion.dart';
 part 'src/warehouse/elasticsearch_mixin.dart';
+part 'src/warehouse/repository.dart';
 part 'src/warehouse/query_response.dart';
 
 typedef Map<String, dynamic> SearchSerializer(entity);

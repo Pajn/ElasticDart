@@ -75,6 +75,9 @@ class Elasticsearch {
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/indices-delete-index.html)
   Future deleteIndex(String name) => elasticRequest.delete(name);
 
+   Future<Map<String, dynamic>> get(String index, String type, id) =>
+      elasticRequest.get('$index/$type/$id');
+
   /// Searches the given [index] or all indices if _all is passed.
   ///
   /// Examples:
@@ -96,8 +99,12 @@ class Elasticsearch {
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/search-search.html)
   Future<Map<String, dynamic>> search(
-          {String index: '_all', Map<String, dynamic> query: const {}}) =>
-      elasticRequest.post('$index/_search', query);
+          {String index: '_all', String type: '', Map<String, dynamic> query: const {}}) =>
+      elasticRequest.post('$index/$type/_search', query);
+
+  Future<Map<String, dynamic>> count(
+          {String index: '_all', String type: '', Map<String, dynamic> query: const {}}) =>
+      elasticRequest.get('$index/$type/_count', query);
 
   /// Register specific [mapping] definition for a specific [type].
   ///

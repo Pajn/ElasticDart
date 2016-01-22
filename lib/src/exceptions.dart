@@ -2,13 +2,9 @@ part of elastic_dart;
 
 final _indexMissing = new RegExp(r'IndexMissingException\[\[([^\]]+)\] missing\]');
 String _missingIndex(error) {
-  if (error is String) {
-    return _indexMissing.firstMatch(error).group(1);
-  } else if (error is Map) {
-    return error['index'];
-  } else {
-    return 'Unknown Index';
-  }
+  if (error is String) return _indexMissing.firstMatch(error).group(1);
+  else if (error is Map) return error['index'];
+  else return 'Unknown Index';
 }
 
 String _errorMessage(responseError) {
@@ -24,8 +20,7 @@ class ElasticsearchException implements Exception {
   final Map response;
 
   ElasticsearchException(Map response, [String message]) :
-    this.message = (message == null)
-        ? _errorMessage(response['error']) : message,
+    this.message = message ?? _errorMessage(response['error']),
     this.status = response['status'],
     this.response = response;
 

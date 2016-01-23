@@ -42,7 +42,7 @@ class ElasticRepository<T> extends RepositoryBase<T> {
       String sort,
       List<Type> types
   }) async {
-    final query = createQuery(session.lookingGlass, where);
+    final query = createQuery(session.lookingGlass, where, types);
 
     if (skip != 0) {
       query['from'] = skip;
@@ -56,18 +56,13 @@ class ElasticRepository<T> extends RepositoryBase<T> {
       query['sort'] = [sort];
     }
 
-//    print(query);
     try {
       final response = await session.db.search(
           index: index,
           query: query
       );
 
-//      print(response);
-  //
-      // print('\n\n\n');
-
-      return response['hits']['hits'].map(_instantiate).toList();
+      return response['hits']['hits'].map(_instantiateWithCache()).toList();
     } on IndexMissingException {
       return [];
     }
@@ -95,17 +90,25 @@ class ElasticRepository<T> extends RepositoryBase<T> {
           }
       );
 
-      return response['docs'].map(_instantiate).toList();
+      return response['docs'].map(_instantiateWithCache()).toList();
     } on IndexMissingException {
       return [];
     }
   }
 
-  _instantiate(Map document) {
-    final entity = session.lookingGlass.deserializeDocument(document['_source']);
+  _instantiate(Map document, [Map cache]) {
+    final entity = session.lookingGlass.deserializeDocument(
+        document['_source'],
+        cache: cache
+    );
     session.lookingGlass.setId(entity, document['_id']);
     session.attach(entity, document['_id']);
 
     return entity;
+  }
+
+  _instantiateWithCache() {
+    final cache = new HashMap();
+    return (document) => _instantiate(document, cache);
   }
 }

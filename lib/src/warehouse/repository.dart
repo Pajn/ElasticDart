@@ -56,6 +56,10 @@ class ElasticRepository<T> extends RepositoryBase<T> {
       query['sort'] = [sort];
     }
 
+    return search(query);
+  }
+
+  Future<List<T>> search(Map query) async {
     try {
       final response = await session.db.search(
           index: index,

@@ -1,7 +1,6 @@
 library elastic_dart.warehouse;
 
 import 'dart:async';
-import 'dart:convert';
 import 'package:elastic_dart/elastic_dart.dart';
 import 'package:warehouse/adapters/base.dart';
 import 'package:warehouse/warehouse.dart';

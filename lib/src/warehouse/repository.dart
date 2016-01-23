@@ -18,7 +18,6 @@ class ElasticRepository<T> extends RepositoryBase<T> {
   Future<int> countAll({Map where, List<Type> types}) async {
     final response = await session.db.count(
         index: index,
-        type: type,
         query: createQuery(session.lookingGlass, where)
     );
 
@@ -64,7 +63,7 @@ class ElasticRepository<T> extends RepositoryBase<T> {
           query: query
       );
 
-  //    print(response);
+//      print(response);
   //
       // print('\n\n\n');
 

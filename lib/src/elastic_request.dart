@@ -26,7 +26,7 @@ class ElasticRequest {
     var response = await client.send(request);
     var responseBody = _responseDecoder.convert(await response.stream.toBytes());
 
-    if (response.statusCode >= 400) {
+    if (response.statusCode >= 400 && response.statusCode != 404) {
       var error = responseBody['error'];
       if ((error is String && error.startsWith('IndexMissingException'))
           || (error is Map && error['type'] == 'index_missing_exception')

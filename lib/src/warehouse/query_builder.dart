@@ -32,7 +32,9 @@ Map createQuery(LookingGlass lg, Map where, [String type]) {
 
   if (filters.isEmpty) {
     return {
-      'match_all': {},
+      'query': {
+        'match_all': {},
+      }
     };
   }
 

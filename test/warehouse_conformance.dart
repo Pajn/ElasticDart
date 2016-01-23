@@ -9,6 +9,7 @@ main() {
   runConformanceTests(
       () => new ElasticSession(db, indices: {
         AnimatedMovie: 'movie',
+        Child: 'base',
       }),
       (session, type) => new ElasticRepository.withType(session, type),
       testTimeout: const Duration(seconds: 10)

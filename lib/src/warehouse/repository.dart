@@ -87,18 +87,15 @@ class ElasticRepository<T> extends RepositoryBase<T> {
   @override
   Future<List<T>> getAll(Iterable ids) async {
     try {
-      final response = await session.db.search(
+      final response = await session.db.multiGet(
           index: index,
+          type: '_all',
           query: {
-            'query': {
-              'ids' : {
-                'values' : ids.toList(),
-              }
-            }
+            'ids': ids.toList()
           }
       );
 
-      return response['hits']['hits'].map(_instantiate).toList();
+      return response['docs'].map(_instantiate).toList();
     } on IndexMissingException {
       return [];
     }

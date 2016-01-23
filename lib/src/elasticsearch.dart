@@ -139,6 +139,10 @@ class Elasticsearch {
   Future getMapping({String index: '_all', String type: ''}) =>
       elasticRequest.get('$index/_mapping/$type');
 
+  Future multiGet({Map query, String index, String type}) =>
+    elasticRequest.post('$index/$type/_mget', query);
+
+
   /// Perform many index, delete, create, or update operations in a single call.
   ///
   /// Examples:

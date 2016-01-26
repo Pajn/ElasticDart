@@ -173,7 +173,7 @@ class Elasticsearch {
   ///
   /// For more information see:
   ///   [Elasticsearch documentation](http://elastic.co/guide/en/elasticsearch/reference/1.5/docs-bulk.html)
-  Future bulk(List<Map> mapList, {String index: '_all', String type: '', bool refresh: false}) {
+  Future bulk(Iterable<Map> mapList, {String index: '_all', String type: '', bool refresh: false}) {
     // Elasticsearch needs maps to be on new lines. Last line needs
     // to be a newline as well.
     var body = mapList.map(JSON.encode).join('\n') + '\n';

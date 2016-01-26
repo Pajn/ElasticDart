@@ -156,9 +156,7 @@ main(Elasticsearch es) {
     });
 
     describe('deleteIndex', () {
-      afterEach(() async {
-        es.createIndex(firstIndex, throwIfExists: false);
-      });
+      afterEach(() => es.createIndex(firstIndex, throwIfExists: false));
 
       it('should be able to delete a index', () async {
         var result = await es.deleteIndex(firstIndex);
@@ -217,9 +215,7 @@ main(Elasticsearch es) {
         });
       });
 
-      afterEach(() async {
-        await es.deleteIndex('test-index');
-      });
+      afterEach(() => es.deleteIndex('test-index'));
 
       it('should be able to get mapping on an index with a type', () async {
         var result =

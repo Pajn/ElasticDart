@@ -1,8 +1,8 @@
 # ElasticDart
-[![Build Status](https://travis-ci.org/Pajn/ElasticDart.svg?branch=master)](https://travis-ci.org/Pajn/ElasticDart)
-[![Coverage Status](https://coveralls.io/repos/Pajn/ElasticDart/badge.svg)](https://coveralls.io/r/Pajn/ElasticDart)
+[![Build Status](https://travis-ci.org/beanloop/ElasticDart.svg?branch=master)](https://travis-ci.org/beanloop/ElasticDart)
+[![Coverage Status](https://coveralls.io/repos/beanloop/ElasticDart/badge.svg)](https://coveralls.io/r/beanloop/ElasticDart)
 
-An Elasticsearch connector for Dart. 
+An Elasticsearch connector for Dart.
 Includes both a thin wrapper around the REST API for indexing and querying and
 a [Warehouse][] companion adapter for easily adding search and ranking to repositories.
 

@@ -19,7 +19,7 @@ setUpTestData() async {
     {"index": {"_index": "my_movies", "_type": "movies", "_id": "4"}},
     {"name": "Star Wars: Episode I - The Phantom Menace", "year": "1999"}
   ];
-  await client.post('http://127.0.0.1:9200/_bulk/',
+  await client.post('http://127.0.0.1:9200/_bulk?refresh=true',
       body: body.map(JSON.encode).join('\n') + '\n');
 }
 
@@ -31,6 +31,6 @@ cleanUpTestData() async {
     {"delete": {"_index": "my_movies", "_type": "movies", "_id": "3"}},
     {"delete": {"_index": "my_movies", "_type": "movies", "_id": "4"}},
   ];
-  await client.post('http://127.0.0.1:9200/_bulk/',
+  await client.post('http://127.0.0.1:9200/_bulk?refresh=true',
       body: body.map(JSON.encode).join('\n') + '\n');
 }

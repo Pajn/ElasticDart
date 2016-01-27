@@ -8,9 +8,8 @@ import 'package:warehouse/warehouse.dart';
 import 'package:elastic_dart/warehouse.dart';
 import '../../helpers/domain.dart';
 
-main() {
+main(Elasticsearch es) {
   describe('Warehouse companion', () {
-    var es = new Elasticsearch();
     DbSession session;
     CinemaRepository cinemaRepository;
     GenericRepository combinedRepository, customCombinedIndex;

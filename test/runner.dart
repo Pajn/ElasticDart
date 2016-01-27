@@ -1,18 +1,18 @@
-import 'dart:async';
 import 'package:unittest/unittest.dart' show unittestConfiguration;
 
 import 'helpers/testdata.dart';
 import 'specs/elasticsearch.dart' as elasticsearch;
 import 'specs/warehouse/warehouse.dart' as warehouse;
+import 'warehouse_conformance.dart' as warehouse_conformance;
 import 'package:elastic_dart/elastic_dart.dart';
 
 main() async {
   await setUpTestData();
-  // Wait for elastic to index the new documents
-  await new Future.delayed(new Duration(seconds: 2));
+  final es = new Elasticsearch('http://172.17.0.2:9200');
 
   unittestConfiguration.timeout = const Duration(seconds: 5);
 
-  elasticsearch.main(new Elasticsearch());
-  warehouse.main();
+  elasticsearch.main(es);
+  warehouse.main(es);
+  warehouse_conformance.main(es);
 }

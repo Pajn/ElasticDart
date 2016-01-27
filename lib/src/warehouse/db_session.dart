@@ -1,6 +1,6 @@
 part of elastic_dart.warehouse;
 
-class ElasticSession extends DbSessionBase<Elasticsearch> {
+class ElasticDbSession extends DbSessionBase<Elasticsearch> {
   final Map<Type, String> indices;
 
   @override
@@ -12,7 +12,27 @@ class ElasticSession extends DbSessionBase<Elasticsearch> {
   @override
   final supportsListsAsProperty = false;
 
-  ElasticSession(this.db, {this.indices});
+  ElasticDbSession(this.db, {this.indices: const {}});
+
+  Future mapTypes(List<Type> types) async {
+    for (final type in types) {
+      final mapping = findMapping(type);
+      if (mapping.isEmpty) continue;
+
+      await mapType(type, mapping);
+    }
+  }
+
+  Future mapType(Type type, [Map mapping]) async {
+    final label = findLabel(type);
+    final index = indices[type] ?? label.toLowerCase();
+
+    await db.putMapping(
+        {label: {'properties': mapping}},
+        index: index,
+        type: label
+    );
+  }
 
   @override
   writeQueue() async {

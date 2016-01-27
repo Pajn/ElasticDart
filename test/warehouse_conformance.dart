@@ -4,13 +4,27 @@ import 'package:elastic_dart/warehouse.dart';
 import 'package:warehouse/adapters/conformance_tests.dart';
 import 'package:warehouse/src/adapters/conformance_tests/domain.dart';
 
-main() {
-  var db = new Elasticsearch('http://172.17.0.2:9200');
+main([Elasticsearch es]) async {
+  final db = es ?? new Elasticsearch('http://172.17.0.2:9200');
+
+  createSession() => new ElasticDbSession(db, indices: {
+    AnimatedMovie: 'movie',
+    Child: 'base',
+  });
+
+  final session = createSession();
+  final titleMapping = {
+    'title': {
+      'type': 'string',
+      'index': 'not_analyzed',
+    }
+  };
+
+  await session.mapType(Movie, titleMapping);
+  await session.mapType(AnimatedMovie, titleMapping);
+
   runConformanceTests(
-      () => new ElasticSession(db, indices: {
-        AnimatedMovie: 'movie',
-        Child: 'base',
-      }),
+      createSession,
       (session, type) => new ElasticRepository.withType(session, type),
       testTimeout: const Duration(seconds: 10)
   );

@@ -70,15 +70,19 @@ main(Elasticsearch es) {
       it('should be able to search the whole database without a query',
           () async {
         var result = await es.search();
+
+        result['hits']['hits'].sort((a, b) => a['_index'].compareTo(b['_index']));
+        result['hits']['hits'].sort((a, b) => a['_id'].compareTo(b['_id']));
+
         expect(result['_shards']).toBeNotNull();
 
         // Expect our indices to exist
         expect(result['hits']['hits'][0]['_index']).toEqual(firstIndex);
-        expect(result['hits']['hits'][2]['_index']).toEqual(secondIndex);
+        expect(result['hits']['hits'][1]['_index']).toEqual(secondIndex);
 
-        expect(result['hits']['hits'][0]['_source']['name'])
-            .toEqual('Star Wars: Episode I - The Phantom Menace');
         expect(result['hits']['hits'][4]['_source']['name'])
+            .toEqual('Star Wars: Episode I - The Phantom Menace');
+        expect(result['hits']['hits'][3]['_source']['name'])
             .toEqual('Annabelle');
       });
 
@@ -117,8 +121,8 @@ main(Elasticsearch es) {
     describe('createIndex', () {
       afterEach(() async {
         try {
-          await es.deleteIndex('new-index');
-        } catch (_) {}
+          await es.deleteIndex('new-index', refresh: true);
+        } on IndexMissingException {}
       });
 
       it('should be able to create a new index', () async {
@@ -149,7 +153,18 @@ main(Elasticsearch es) {
         var result = await es.createIndex(firstIndex, throwIfExists: false);
 
         expect(result).toEqual({
-          'error': 'IndexAlreadyExistsException[[$firstIndex] already exists]',
+          'error': {
+            'root_cause': [
+              {
+                'type': 'index_already_exists_exception',
+                'reason': 'already exists',
+                'index': 'name'
+              }
+            ],
+            'type': 'index_already_exists_exception',
+            'reason': 'already exists',
+            'index': 'name'
+          },
           'status': 400
         });
       });

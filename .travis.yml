@@ -5,7 +5,7 @@ dart:
   - stable
 
 before_install:
-  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-2.1.1.deb && sudo service elasticsearch start
+  - curl -OL https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-2.1.1.deb && sudo service elasticsearch start
   - sleep 5
 
 script: ./tool/travis.sh

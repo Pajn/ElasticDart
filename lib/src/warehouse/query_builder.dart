@@ -1,3 +1,4 @@
+import 'package:quiver_pattern/regexp.dart' show escapeRegExp;
 import 'package:warehouse/warehouse.dart';
 import 'package:warehouse/adapters/base.dart';
 
@@ -63,10 +64,13 @@ Map visitMatcher(String property, Matcher matcher, LookingGlass lg) {
         property: value(matcher.expected, lg),
       }
     };
-    //  } else if (matcher is StringContainMatcher) {
-    //    var pattern = escapeRegex(matcher.expected);
-    //    var parameter = setParameter(parameters, '(?i).*$pattern.*', lg);
-    //    return '{field} =~ $parameter';
+  } else if (matcher is StringContainMatcher) {
+    final pattern = escapeRegExp(matcher.expected);
+    return {
+      'regexp': {
+        property: value('.*$pattern.*', lg),
+      }
+    };
   } else if (matcher is InListMatcher) {
     if (matcher.list.length == 1) {
       return {

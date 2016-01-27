@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:unittest/unittest.dart' show unittestConfiguration;
 import 'package:http/browser_client.dart';
 
@@ -8,9 +7,7 @@ import 'package:elastic_dart/browser_client.dart';
 
 main() async {
   testdata.client = new BrowserClient();
-  await testdata.setUpTestData();
-  // Wait for elastic to index the new documents
-  await new Future.delayed(new Duration(seconds: 2));
+  await testdata.cleanUpTestData();
 
   unittestConfiguration.timeout = const Duration(seconds: 5);
 

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 var client = new http.Client();
 
 setUpTestData() async {
-  await client.delete('http://127.0.0.1:9200/_all/');
+  await client.delete('http://127.0.0.1:9200/my_movies,my_other_movies/');
   var body = [
     {"index": {"_index": "my_movies", "_type": "movies", "_id": "1"}},
     {"name": "The hunger games", "year": "2012"},
@@ -23,14 +23,4 @@ setUpTestData() async {
       body: body.map(JSON.encode).join('\n') + '\n');
 }
 
-cleanUpTestData() async {
-  var body = [
-    {"delete": {"_index": "my_movies", "_type": "movies", "_id": "1"}},
-    {"delete": {"_index": "my_other_movies", "_type": "movies", "_id": "1"}},
-    {"delete": {"_index": "my_movies", "_type": "movies", "_id": "2"}},
-    {"delete": {"_index": "my_movies", "_type": "movies", "_id": "3"}},
-    {"delete": {"_index": "my_movies", "_type": "movies", "_id": "4"}},
-  ];
-  await client.post('http://127.0.0.1:9200/_bulk?refresh=true',
-      body: body.map(JSON.encode).join('\n') + '\n');
-}
+cleanUpTestData() => client.delete('http://127.0.0.1:9200/_all/');

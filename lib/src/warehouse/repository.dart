@@ -2,14 +2,14 @@ part of elastic_dart.warehouse;
 
 class ElasticRepository<T> extends RepositoryBase<T> {
   final String index;
-  final ElasticSession session;
+  final ElasticDbSession session;
 
-  ElasticRepository(ElasticSession session, {String index})
+  ElasticRepository(ElasticDbSession session, {String index})
       : this.index = index ?? findLabel(T).toLowerCase(),
         this.session = session,
         super(session);
 
-  ElasticRepository.withType(ElasticSession session, Type type, {String index})
+  ElasticRepository.withType(ElasticDbSession session, Type type, {String index})
       : this.index = index ?? findLabel(type).toLowerCase(),
         this.session = session,
         super(session, types: [type]);
@@ -26,12 +26,25 @@ class ElasticRepository<T> extends RepositoryBase<T> {
 
   @override
   Future deleteAll({Map where}) async {
-    // TODO: implement deleteAll
-    if (where == null || where.isNotEmpty) {
-      try {
-        await session.db.deleteIndex('$index');
-      } on IndexMissingException {}
-    }
+    try {
+      final query = createQuery(session.lookingGlass, where);
+      final scroll = await session.db.scroll(index: index, query: query);
+      final List bulk = [];
+
+      List hits;
+      do {
+        final response = await scroll.get();
+        hits = response['hits']['hits'];
+
+        for (final hit in hits) {
+          bulk.add({'delete': {'_id': hit['_id'], '_index': hit['_index'], '_type': hit['_type']}});
+        }
+      } while (hits.isNotEmpty);
+
+      if (bulk.isNotEmpty) {
+        await session.db.bulk(bulk, refresh: true);
+      }
+    } on IndexMissingException {}
   }
 
   @override

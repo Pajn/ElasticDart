@@ -4,15 +4,13 @@ import 'package:guinness/guinness.dart';
 import 'package:unittest/unittest.dart' show expectAsync;
 
 import 'package:elastic_dart/elastic_dart.dart';
+import '../helpers/testdata.dart';
 
 main(Elasticsearch es) {
   var firstIndex = 'my_movies';
   var secondIndex = 'my_other_movies';
 
-  afterEach(() async {
-    await es.bulk(
-        [{"delete": {"_index": secondIndex, "_type": "movies", "_id": "2"}}]);
-  });
+  beforeEach(setUpTestData);
 
   describe('Elasticsearch', () {
     describe('getIndex', () {
@@ -67,23 +65,21 @@ main(Elasticsearch es) {
             .toEqual('Star Wars: Episode I - The Phantom Menace');
       });
 
-      it('should be able to search the whole database without a query',
+      it('should be able to search on a specific index without a query',
           () async {
-        var result = await es.search();
+        var result = await es.search(index: firstIndex);
 
-        result['hits']['hits'].sort((a, b) => a['_index'].compareTo(b['_index']));
         result['hits']['hits'].sort((a, b) => a['_id'].compareTo(b['_id']));
 
         expect(result['_shards']).toBeNotNull();
 
-        // Expect our indices to exist
         expect(result['hits']['hits'][0]['_index']).toEqual(firstIndex);
-        expect(result['hits']['hits'][1]['_index']).toEqual(secondIndex);
+        expect(result['hits']['hits'].length).toEqual(4);
 
-        expect(result['hits']['hits'][4]['_source']['name'])
-            .toEqual('Star Wars: Episode I - The Phantom Menace');
-        expect(result['hits']['hits'][3]['_source']['name'])
+        expect(result['hits']['hits'][2]['_source']['name'])
             .toEqual('Annabelle');
+        expect(result['hits']['hits'][3]['_source']['name'])
+            .toEqual('Star Wars: Episode I - The Phantom Menace');
       });
 
       it('should be able to search on a specific index with a query', () async {
@@ -194,7 +190,7 @@ main(Elasticsearch es) {
       it('should be able to put mapping', () async {
         var result = await es.putMapping({
           "test-type": {
-            "properties": {"name": {"type": "string", "store": "yes"}}
+            "properties": {"nisse": {"type": "string", "store": "yes"}}
           }
         }, index: firstIndex, type: 'test-type');
         expect(result).toEqual({'acknowledged': true});

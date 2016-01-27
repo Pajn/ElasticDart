@@ -3,7 +3,7 @@ part of elastic_dart;
 /// A wrapper around the Elasticsearch REST API.
 class Elasticsearch {
   /// The address of the ElasticSearch REST API.
-  final elasticRequest;
+  final ElasticRequest elasticRequest;
 
   Elasticsearch([String host = 'http://127.0.0.1:9200', http.Client client])
       : elasticRequest = new ElasticRequest(host, client: client);
@@ -103,9 +103,14 @@ class Elasticsearch {
           {String index: '_all', String type: '', Map<String, dynamic> query: const {}}) =>
       elasticRequest.post('$index/$type/_search', query);
 
+  Future<Scroll> scroll(
+      {String index: '_all', String type: '', Map<String, dynamic> query: const {}, String scroll: '1m'}) =>
+      elasticRequest.post('$index/$type/_search?scroll=$scroll&search_type=scan', query)
+          .then((result) => new Scroll(elasticRequest, result));
+
   Future<Map<String, dynamic>> count(
           {String index: '_all', String type: '', Map<String, dynamic> query: const {}}) =>
-      elasticRequest.get('$index/$type/_count', query);
+      elasticRequest.post('$index/$type/_count', query);
 
   /// Register specific [mapping] definition for a specific [type].
   ///
@@ -180,4 +185,26 @@ class Elasticsearch {
     var body = mapList.map(JSON.encode).join('\n') + '\n';
     return elasticRequest.post('$index/$type/_bulk?refresh=$refresh', body);
   }
+}
+
+class Scroll {
+  final ElasticRequest elasticRequest;
+  var id;
+
+  Scroll(this.elasticRequest, Map result)
+    : id = result['_scroll_id'];
+
+  Future get({String scroll: '1m'}) async {
+    final result = await elasticRequest.post('_search/scroll', {
+      'scroll': scroll,
+      'scroll_id': id,
+    });
+    id = result['_scroll_id'];
+    return result;
+  }
+
+  Future clear() =>
+      elasticRequest.delete('_search/scroll', {
+        'scroll_id': [id],
+      });
 }

@@ -27,6 +27,6 @@ main([Elasticsearch es]) async {
   runConformanceTests(
       createSession,
       (session, type) => new ElasticRepository.withType(session, type),
-      testTimeout: const Duration(seconds: 10)
+      testTimeout: const Duration(seconds: 5)
   );
 }

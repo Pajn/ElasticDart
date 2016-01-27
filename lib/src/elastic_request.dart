@@ -12,7 +12,7 @@ class ElasticRequest {
   Future get(String path) => _request('GET', path);
   Future post(String path, body) => _request('POST', path, body);
   Future put(String path, body) => _request('PUT', path, body);
-  Future delete(String path) => _request('DELETE', path);
+  Future delete(String path, [body]) => _request('DELETE', path, body);
 
   Future _request(String method, String path, [body]) async {
     var request = new http.Request(method, Uri.parse('$host/$path'));

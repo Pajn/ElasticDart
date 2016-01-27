@@ -20,6 +20,7 @@ main([Elasticsearch es]) async {
     }
   };
 
+  await session.db.createIndex('movie', throwIfExists: false);
   await session.mapType(Movie, titleMapping);
   await session.mapType(AnimatedMovie, titleMapping);
 

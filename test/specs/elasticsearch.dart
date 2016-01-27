@@ -121,7 +121,7 @@ main(Elasticsearch es) {
     describe('createIndex', () {
       afterEach(() async {
         try {
-          await es.deleteIndex('new-index', refresh: true);
+          await es.deleteIndex('new-index');
         } on IndexMissingException {}
       });
 
@@ -158,12 +158,12 @@ main(Elasticsearch es) {
               {
                 'type': 'index_already_exists_exception',
                 'reason': 'already exists',
-                'index': 'name'
+                'index': 'my_movies'
               }
             ],
             'type': 'index_already_exists_exception',
             'reason': 'already exists',
-            'index': 'name'
+            'index': 'my_movies'
           },
           'status': 400
         });

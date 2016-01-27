@@ -111,6 +111,9 @@ main(Elasticsearch es) {
       await storeAndSave();
       var entities = await combinedRepository.search('The');
 
+      entities.sort((a, b) => (a is Cinema ? a.name : a.title)
+          .compareTo(b is Cinema ? b.name : b.title));
+
       expect(entities[0].name).toEqual('The Cinema');
       expect(entities[1].title).toEqual('The Hobbit: An Unexpected Journey');
     });
@@ -125,6 +128,9 @@ main(Elasticsearch es) {
 
       await storeAndSave();
       var entities = await combinedRepository.search('The');
+
+      entities.sort((a, b) => (a is Cinema ? a.name : a.title)
+          .compareTo(b is Cinema ? b.name : b.title));
 
       expect(entities[0].name).toEqual('The Cinema');
       expect(entities[1].title).toEqual('The Hobbit: An Unexpected Journey');

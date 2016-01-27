@@ -5,7 +5,7 @@ import 'package:warehouse/adapters/conformance_tests.dart';
 import 'package:warehouse/src/adapters/conformance_tests/domain.dart';
 
 main([Elasticsearch es]) async {
-  final db = es ?? new Elasticsearch('http://127.0.0.1:9200');
+  final db = es ?? new Elasticsearch();
 
   createSession() => new ElasticDbSession(db, indices: {
     AnimatedMovie: 'movie',

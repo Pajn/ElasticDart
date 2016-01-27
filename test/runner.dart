@@ -8,7 +8,7 @@ import 'package:elastic_dart/elastic_dart.dart';
 
 main() async {
   await setUpTestData();
-  final es = new Elasticsearch('http://127.0.0.1:9200');
+  final es = new Elasticsearch();
 
   unittestConfiguration.timeout = const Duration(seconds: 5);
 
